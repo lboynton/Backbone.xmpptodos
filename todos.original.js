@@ -6,17 +6,11 @@
 // Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
 
-  // The Strophe connection
-  var connection;
-
   // Todo Model
   // ----------
 
   // Our basic **Todo** model has `title`, `order`, and `done` attributes.
   var Todo = Backbone.Model.extend({
-
-    // Override sync
-    sync: Backbone.xmppSync,
 
     // Default attributes for the todo item.
     defaults: function() {
@@ -56,8 +50,8 @@ $(function(){
     // Reference to this collection's model.
     model: Todo,
 
-    // Override sync
-    sync: Backbone.xmppSync,
+    // Save all of the todo items under the `"todos"` namespace.
+    localStorage: new Store("todos-backbone"),
 
     // Filter down the list of all todo items that are finished.
     done: function() {
@@ -113,7 +107,6 @@ $(function(){
     initialize: function() {
       this.model.bind('change', this.render, this);
       this.model.bind('destroy', this.remove, this);
-      this.model.bind('remove', this.remove, this);
     },
 
     // Re-render the titles of the todo item.
@@ -146,11 +139,6 @@ $(function(){
     // If you hit `enter`, we're through editing the item.
     updateOnEnter: function(e) {
       if (e.keyCode == 13) this.close();
-    },
-
-    // Remove this view from the DOM.
-    remove: function() {
-      $(this.el).remove();
     },
 
     // Remove the item, destroy the model.
@@ -251,31 +239,7 @@ $(function(){
 
   });
 
-  // Connect to XMPP
-  var XMPPConnection = new Strophe.Connection('http://localhost:8080/http-bind'),
-      chars = 'abcdefghijklmnopqrstuvwxyz',
-      resource = '';
-  for(var i=0; i < 5; i++) {
-        resource += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
-
-  XMPPConnection.connect('foo@localhost/' + resource, 'foo', function (status) {
-    // Set the connection on the storage
-    if (status === Strophe.Status.CONNECTED) {
-      this.xmlInput = function (data) { console.log ('IN:', data);};
-      this.xmlOutput = function (data) { console.log ('OUT:', data);};
-
-      // Send online presence
-      this.send($pres());
-      debugger;
-      // Create our global collection of **Todos**.
-      Todos.node = new PubSubNodeStorage('todos', this);
-      connection = this;
-      // Finally, we kick things off by creating the **App**.
-      window.App = new AppView();
-    }
-  });
-      window.Todos = Todos;
+  // Finally, we kick things off by creating the **App**.
+  var App = new AppView;
 
 });
