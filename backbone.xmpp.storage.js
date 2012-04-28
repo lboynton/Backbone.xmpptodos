@@ -13,13 +13,13 @@
     // A PubSub node acting as storage.
     // Create it with the `id` the node has on the XMPP server,
     // and a Strophe `connection`.
-    var PubSubNodeStorage = function(id, connection) {
+    var PubSubStorage = function(id, connection) {
         this.id = id;
         this.connection = connection;
     };
 
-    // Attach methods to **PubSubNodeStorage**.
-    _.extend(PubSubNodeStorage.prototype, {
+    // Attach methods to **PubSubStorage**.
+    _.extend(PubSubStorage.prototype, {
 
         // **create** publishes to the node the model in JSON format.
         //Resolves by setting and returning the `id` of the item.
@@ -65,9 +65,10 @@
         },
 
         // **getItems** resolves by returning the array of all models currently published on the node.
-        getItems: function() {
+        getItems: function(options) {
             var d = $.Deferred(),
-                p = this.connection.PubSub.items(this.id);
+                p;
+            p = this.connection.PubSub.items(this.id, options);
             p.done(function (items) {
                 var id, attrs;
                 d.resolve(_.map(items, function (item) {
@@ -94,30 +95,31 @@
 
     // **xmppAsync** is the replacement for **sync**. It delegates sync operations
     // to the model or collection's `node` property, which should be an instance
-    // of **PubSubNodeStorage**.
+    // of **PubSubStorage**.
     Backbone.xmppSync = function(method, model, options) {
 
         var p,
             node = model.node || (model.collection && model.collection.node);
 
+        options = options || {};
+
         // If there is no node, fail directly, somebody did not read the docs.
         if (!node) return $.Deferred().reject().promise();
 
         switch (method) {
-            case "read":    p = typeof model.id !== 'undefined' ? node.getItem(model) : node.getItems(); break;
+            case "read":    p = typeof model.id !== 'undefined' ? node.getItem(model) : node.getItems(options); break;
             case "create":  p = node.create(model); break;
             case "update":  p = node.update(model); break;
             case "delete":  p = node.destroy(model); break;
         }
 
         // Fallback for old-style callbacks.
-        options = options || {};
         if (options.success) p.done(options.success);
         if (options.error) p.fail(options.error);
 
         return p;
     };
 
-    this.PubSubNodeStorage = PubSubNodeStorage;
+    this.PubSubStorage = PubSubStorage;
 
 })(this.jQuery, this._, this.Backbone, this.Strophe);

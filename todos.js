@@ -13,10 +13,7 @@ $(function(){
   // ----------
 
   // Our basic **Todo** model has `title`, `order`, and `done` attributes.
-  var Todo = Backbone.Model.extend({
-
-    // Override sync
-    sync: Backbone.xmppSync,
+  var Todo = PubSubItem.extend({
 
     // Default attributes for the todo item.
     defaults: function() {
@@ -51,7 +48,7 @@ $(function(){
 
   // The collection of todos is backed by *localStorage* instead of a remote
   // server.
-  var TodoList = Backbone.Collection.extend({
+  var TodoList = PubSubNode.extend({
 
     // Reference to this collection's model.
     model: Todo,
@@ -82,9 +79,6 @@ $(function(){
     }
 
   });
-
-  // Create our global collection of **Todos**.
-  var Todos = new TodoList;
 
   // Todo Item View
   // --------------
@@ -268,9 +262,8 @@ $(function(){
 
       // Send online presence
       this.send($pres());
-      debugger;
       // Create our global collection of **Todos**.
-      Todos.node = new PubSubNodeStorage('todos', this);
+      Todos = new TodoList([], {id: 'todos', connection: this});
       connection = this;
       // Finally, we kick things off by creating the **App**.
       window.App = new AppView();
