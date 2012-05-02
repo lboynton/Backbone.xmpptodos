@@ -60,6 +60,7 @@ $(function(){
 
     // Filter down the list to only todo items that are still not finished.
     remaining: function() {
+      console.log(this.models);
       return this.without.apply(this, this.done());
     },
 
@@ -225,7 +226,7 @@ $(function(){
       if (e.keyCode != 13) return;
       if (!this.input.val()) return;
 
-      Todos.create({title: this.input.val()}, {silent: true});
+      Todos.create({title: this.input.val()}, {wait: true});
       this.input.val('');
     },
 
