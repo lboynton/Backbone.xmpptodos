@@ -30,7 +30,6 @@ $(function(){
 
     // Toggle the `done` state of this todo item.
     toggle: function() {
-      debugger;
       this.save({done: !this.get("done")});
     },
 
@@ -105,7 +104,6 @@ $(function(){
     // app, we set a direct reference on the model for convenience.
     initialize: function() {
       this.model.bind('change', this.render, this);
-      this.model.bind('destroy', this.remove, this);
       this.model.bind('remove', this.remove, this);
     },
 
