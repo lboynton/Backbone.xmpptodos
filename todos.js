@@ -6,9 +6,6 @@
 // Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
 
-  // The Strophe connection
-  var connection;
-
   // Todo Model
   // ----------
 
@@ -33,6 +30,7 @@ $(function(){
 
     // Toggle the `done` state of this todo item.
     toggle: function() {
+      debugger;
       this.save({done: !this.get("done")});
     },
 
@@ -79,6 +77,7 @@ $(function(){
     }
 
   });
+  var Todos;
 
   // Todo Item View
   // --------------
@@ -144,6 +143,7 @@ $(function(){
 
     // Remove this view from the DOM.
     remove: function() {
+      console.log('remove');
       $(this.el).remove();
     },
 
@@ -188,7 +188,6 @@ $(function(){
 
       this.footer = this.$('footer');
       this.main = $('#main');
-
       Todos.fetch();
     },
 
@@ -228,7 +227,7 @@ $(function(){
       if (e.keyCode != 13) return;
       if (!this.input.val()) return;
 
-      Todos.create({title: this.input.val()});
+      Todos.create({title: this.input.val()}, {silent: true});
       this.input.val('');
     },
 
@@ -250,7 +249,7 @@ $(function(){
       chars = 'abcdefghijklmnopqrstuvwxyz',
       resource = '';
   for(var i=0; i < 5; i++) {
-        resource += chars.charAt(Math.floor(Math.random() * chars.length));
+    resource += chars.charAt(Math.floor(Math.random() * chars.length));
   }
 
 
@@ -264,11 +263,9 @@ $(function(){
       this.send($pres());
       // Create our global collection of **Todos**.
       Todos = new TodoList([], {id: 'todos', connection: this});
-      connection = this;
       // Finally, we kick things off by creating the **App**.
       window.App = new AppView();
     }
   });
-      window.Todos = Todos;
 
 });
